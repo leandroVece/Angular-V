@@ -1,0 +1,94 @@
+<form [formGroup]="form" (ngSubmit)="save()">
+  <p>
+    Name: {{nameField.value}} ({{nameField.valid}})
+    <input [class.is-valid]="isNameFielValid" [class.is-invalid]="isNameFielInvalid" type="text" formControlName="name">
+  </p>
+
+  <div class="messages" [class.active]="isNameFielInvalid">
+    <p>
+      <strong *ngIf="nameField.touched && nameField.hasError('maxlength')"> Debe tener un maximo 10 caracteres</strong>
+    </p>
+    <p>
+      <strong *ngIf="nameField.touched && nameField.hasError('required')"> ESte campo es requerido</strong>
+    </p>
+  </div>
+
+  <p>
+    Email: {{ emailField.value }}
+    <input type="email" formControlName="email" />
+  </p>
+
+  <p>
+    Phone: {{ phoneField.value }}
+    <input type="tel" formControlName="phone" />
+  </p>
+
+  <p>
+    Color: {{ colorField.value }}
+    <input type="color" formControlName="color" />
+  </p>
+
+  <p>
+    Date: {{ dateField.value }}
+    <input type="date" formControlName="date" />
+  </p>
+
+  <p>
+    Month: {{ monthField.value }}
+    <input type="month" formControlName="month" />
+  </p>
+
+  <p>
+    Age: {{ ageField.value }}
+    <input type="number" formControlName="age" />
+  </p>
+
+  <p>
+    Password: {{ passwordField.value }}
+    <input type="password" formControlName="password" />
+  </p>
+
+  <p>
+    Range Price: {{ priceField.value }}
+    <input type="range" formControlName="price" min="0" max="100" />
+  </p>
+
+  <p>
+    Wekend: {{ weekField.value }}
+    <input type="week" formControlName="week" />
+  </p>
+
+  <p>
+    Date and time: {{ timefield.value }}
+    <input type="datetime-local" formControlName="time" />
+  </p>
+
+  <p>
+
+    Search: {{ searchField.value }}
+    <input type="search" formControlName="search" />
+  </p>
+
+  <p>
+
+    category: {{ categoryField.value }}
+    <select formControlName="category">
+      <option value="Category 1">category 1</option>
+      <option value="Category 2">category 2</option>
+      <option value="Category 3">category 3</option>
+
+    </select>
+  </p>
+
+  <p>
+
+    Description: {{ descriptionField.value }}
+    <textarea type="text" formControlName="description">
+      </textarea>
+  </p>
+
+  <p>
+    <button type="submit" [disabled]="form.invalid">Enviar</button>
+  </p>
+
+</form>
