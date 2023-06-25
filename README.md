@@ -419,3 +419,16 @@ Esta es una opcion interesante si es que queremos dividir la informacion de acue
     }
 
 De esta manera podemos separa los formularios de acuerdo a la demanda.
+
+
+### Angular material
+
+Aunque tenemos muchas librerias que nos ayudan a integrar la parte del css como Boostrap, Angular tiene su propio liy de herramientas llamada Angular material. Para intalarlo vamos a nuestra terminal de comando y agregamos.
+
+    ng add @angular/material
+
+no entraremos mucho en el tema para no tocar demaciado el css, pero dejo el [link](https://material.angular.io/components/button/overview) para que todos puedan consultarla y usarla en sus proyecytos si asi lo desean.
+
+>Nota: siempre es bueno no usar mas de una libreria para hacer el mismo trabajo, si estas usando otra como Boostrap es preferible terminar con esa libreria y no implementar otra que podria traer errore.
+
+
