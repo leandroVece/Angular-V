@@ -1,8 +1,9 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+
 
 import { SharedModule } from './shared/shared.module';
 import { AppRoutingModule } from './app-routing.module';
@@ -21,6 +22,7 @@ import { RecoveryComponent } from './webSite/pages/recovery/recovery.component';
 import { ProfileComponent } from './webSite/pages/profile/profile.component';
 import { ProductDetailComponent } from './webSite/pages/product-detail/product-detail.component';
 import { LayoutComponent } from './webSite/components/layout/layout.component';
+import { MaterialModule } from './material/material.modules';
 
 @NgModule({
   declarations: [
@@ -43,7 +45,9 @@ import { LayoutComponent } from './webSite/components/layout/layout.component';
     AppRoutingModule,
     HttpClientModule,
     FormsModule,
-    SharedModule
+    SharedModule,
+    ReactiveFormsModule,
+    MaterialModule
   ],
   providers: [{
     provide: HTTP_INTERCEPTORS,

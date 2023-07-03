@@ -5,8 +5,10 @@ import { User } from '../models/user.models';
 import { Token } from '@angular/compiler';
 import { tap, switchMap } from 'rxjs/operators';
 
+
 import { environment } from './../../environments/environments';
 import { TokenService } from './token.service';
+
 
 import { BehaviorSubject } from 'rxjs';
 
@@ -39,4 +41,6 @@ export class AuthService {
   logout() {
     this.TokenService.removeToken();
   }
+
+
 }

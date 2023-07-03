@@ -432,3 +432,218 @@ no entraremos mucho en el tema para no tocar demaciado el css, pero dejo el [lin
 >Nota: siempre es bueno no usar mas de una libreria para hacer el mismo trabajo, si estas usando otra como Boostrap es preferible terminar con esa libreria y no implementar otra que podria traer errore.
 
 
+## Validaciones Personalisadas
+
+Para hacer algunas validaciones personalisadas segun para nuestros formularios, siempre podemos hacer uso de Js puro para la logica. De esta manera nos haceguramos de darle un poco mas de robustes a la aplicacion y no solo casarnos con lo que Angular nos provee.
+
+Comencemos por crear una nueva carpeta para guardar estos archivos que vamos a usar para nuestras validaciones personalizadas. en mi caso cree una nueva carpeta dentro de app llamada utils. Luego cree un nuevo archivo llamado Validators.ts
+
+    import { AbstractControl } from '@angular/forms';
+
+    export class MyValidators {
+
+
+      static validPassword(control: AbstractControl) {
+        const value = control.value;
+        if (!containsNumber(value)) {
+          return { invalid_password: true };
+        }
+        return null;
+      }
+
+      static matchPasswords(control: AbstractControl) {
+        const password = control.get('password')!.value;
+        const confirmPassword = control.get('confirmPassword')!.value;
+        if (password !== confirmPassword) {
+          return { match_password: true };
+        }
+        return null;
+      }
+
+    }
+
+    function containsNumber(value: string) {
+      return value.split('').find(v => isNumber(v)) !== undefined;
+    }
+
+
+    function isNumber(value: string) {
+      return !isNaN(parseInt(value, 10));
+    }
+
+Para no seguir trabajando en la nada, vamos a hacer nuestras validaciones en componente de registro.
+
+>Por el momento no conectaremos a la api, porque ya se ha hablado del tema con anterioridad. Aun asi puedes asumir el reto para poner a prueba lo aprendido.
+
+
+**ts**
+
+    import { Component } from '@angular/core';
+    import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+    import { Router } from '@angular/router';
+
+    import { AuthService } from 'src/app/services/auth.service';
+    import { MyValidators } from 'src/app/utils/Validators';
+
+    @Component({
+      selector: 'app-register',
+      templateUrl: './register.component.html',
+      styleUrls: ['./register.component.scss']
+    })
+    export class RegisterComponent {
+
+      formRegister!: FormGroup;
+
+      constructor(
+        private formBuilder: FormBuilder,
+        private router: Router,
+        private authService: AuthService
+      ) {
+        this.buildForm();
+      }
+
+      register(event: Event) {
+        //crear evento de registro
+      }
+
+      private buildForm() {
+        this.formRegister = this.formBuilder.group({
+          email: ['', [Validators.required]],
+          password: ['', [Validators.required, Validators.minLength(6), MyValidators.validPassword]],
+          confirmPassword: ['', [Validators.required]],
+        }, {
+          validators: MyValidators.matchPasswords
+        });
+      }
+
+      get passwordField() {
+        return this.formRegister.get('password')!;
+      }
+
+      get confirmPasswordField() {
+        return this.formRegister.get('confirmPassword')!;
+      }
+
+      get emailField() {
+        return this.formRegister.get('email')!;
+      }
+    }
+
+
+Como podemos ver aqui estamos usando no solo los valores requeridos que Angular Fomrs nos trae por defecto sino que tambien estamos usando nuestros propios validadores.
+
+Tamien podemos ver que estamos haciendo uso de validaciones grupales, en este caso podemos notar que tenemos dos campos que tiene que tener los mismos valores. Angular para facilitarnos el trabajo y evitar que copiemos la mismas funciones para dos campos nos permite hacerlo de una forma muy simple, con un objeto que tenga un nuevo parametro de validacion.
+
+    <form [formGroup]="formRegister" (ngSubmit)="register($event)">
+      <mat-card>
+        <mat-card-header>
+          <mat-card-title>Registro</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="row">
+            <div class="col-xs">
+              <mat-form-field>
+                <mat-label>Email</mat-label>
+                <input placeholder="email" formControlName="email" matInput type="email">
+              </mat-form-field>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-xs">
+              <mat-form-field>
+                <mat-label>Password</mat-label>
+                <input placeholder="password" formControlName="password" matInput type="password">
+                <div *ngIf="passwordField.touched && passwordField.invalid">
+                  <mat-error *ngIf="passwordField.hasError('invalid_password')">
+                    Debe tener un numero
+                  </mat-error>
+                </div>
+              </mat-form-field>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-xs">
+              <mat-form-field>
+                <mat-label>Confirm Password</mat-label>
+                <input placeholder="password" formControlName="confirmPassword" matInput type="password">
+                <div *ngIf="confirmPasswordField.touched && formRegister.errors">
+                  <mat-error *ngIf="formRegister.hasError('match_password')">
+                    No hace match
+                  </mat-error>
+                </div>
+              </mat-form-field>
+            </div>
+          </div>
+        </mat-card-content>
+        <mat-card-actions>
+          <button [disabled]="formRegister.invalid" mat-raised-button type="submit">Registro</button>
+        </mat-card-actions>
+      </mat-card>
+    </form>
+
+subamos un nivel mas y creemos en nuestro formulario un campo que tenga una validacion condicional ¿Que quiero decir con esto? simplemente que si un campo cumple las condiciones el siguiente campo sera obligatorio o no.
+
+**Ts**
+
+    private buildForm() {
+        this.form = this.formBuilder.group({
+          email: ['', [Validators.required]],
+          password: ['', [Validators.required, Validators.minLength(6), MyValidators.validPassword]],
+          confirmPassword: ['', [Validators.required]],
+          type: ['company', [Validators.required]],
+          companyName: ['', [Validators.required]],
+        }, {
+          validators: MyValidators.matchPasswords
+        });
+
+        this.typeField.valueChanges
+        .subscribe(value => {
+          if (value === 'company') {
+            this.companyNameField.setValidators([Validators.required]);
+          } else {
+            this.companyNameField.setValidators(null);
+          }
+          this.companyNameField.updateValueAndValidity();
+        });
+      }
+
+      get typeField() {
+        return this.form.get('type');
+      }
+
+      get companyNameField() {
+        return this.form.get('companyName');
+      }
+
+Aqui agregaremos dos campos nuevo a nuestro registro para hacer la prueba. En nuestra funcion agregamos tambien un metodo de subcripcion que vañidara si el input radio tiene un valor determinado en el caso de que si, el siguiente input tendra requisitos de validacion y en caso contraio nos permitira mandar el formulario normalmente.
+
+> Nota: si quieres evitar el problema de **El objeto es posiblemente "null".ts(2531)** vamos a archivo tsconfig.json y agregamos la siguiente linea
+
+    {
+      ...
+      "angularCompilerOptions": {
+      "strictNullChecks": false,
+      ...
+      }
+    }
+
+**html**
+
+    <div class="row">
+      <div class="col-xs">
+        <mat-radio-group formControlName="type" aria-label="Select an option">
+          <mat-radio-button value="company">Company</mat-radio-button>
+          <mat-radio-button value="user">User</mat-radio-button>
+        </mat-radio-group>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-xs">
+        <mat-form-field>
+          <mat-label>Company Name</mat-label>
+          <input placeholder="email" formControlName="companyName" matInput type="text">
+        </mat-form-field>
+      </div>
+    </div>
+
+Con esto ya tienes las una base fuerte en cuanto al manejo de Angular y sus diversas herramientas. Ahora solo queda explorar y experimentar para seguir avanzando y creciendo.
